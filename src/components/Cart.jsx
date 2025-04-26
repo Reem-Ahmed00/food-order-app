@@ -1,79 +1,108 @@
-import PropTypes from 'prop-types'
-import { useContext } from 'react'
-import { CartContext } from '../context/cart.jsx'
+import PropTypes from "prop-types";
+import { useContext, useState } from "react";
+import { CartContext } from "../context/cartContext.jsx";
+import Button from "react-bootstrap/Button";
+import Modal from "react-bootstrap/Modal";
+import Table from "react-bootstrap/Table";
+import CheckoutForm from "./CheckoutForm.jsx";
 
-export default function Cart ({showModal, toggle}) {
 
-  const { cartItems, addToCart, removeFromCart, clearCart, getCartTotal } = useContext(CartContext)
+export default function Cart({ showModal, toggle }) {
+  const { cartItems, addToCart, removeFromCart, clearCart, getCartTotal } =
+    useContext(CartContext);
+const [showCheckoutModal, setShowCheckoutModal] = useState(false);
 
+  const toggleCheckout = () => {
+    setShowCheckoutModal(!showCheckoutModal);
+  };
 
   return (
-    showModal && (
-      <div className="flex-col flex items-center fixed inset-0 left-1/4 bg-white dark:bg-black gap-8  p-10  text-black dark:text-white font-normal uppercase text-sm">
-        <h1 className="text-2xl font-bold">Cart</h1>
-        <div className="absolute right-16 top-10">
-          <button
-            className="px-4 py-2 bg-gray-800 text-white text-xs font-bold uppercase rounded hover:bg-gray-700 focus:outline-none focus:bg-gray-700"
-            onClick={toggle}
-          >
-            Close
-          </button>
-        </div>
-        <div className="flex flex-col gap-4">
-          {cartItems.map((item) => (
-            <div className="flex justify-between items-center" key={item.id}>
-              <div className="flex gap-4">
-                <img src={item.thumbnail} alt={item.title} className="rounded-md h-24" />
-                <div className="flex flex-col">
-                  <h1 className="text-lg font-bold">{item.title}</h1>
-                  <p className="text-gray-600">{item.price}</p>
-                </div>
+
+      <Modal show={showModal} onHide={toggle} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Shopping Cart</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {cartItems.length > 0 ? (
+            <>
+              <Table striped bordered hover>
+                <thead>
+                  <tr>
+                    <th>Image</th>
+                    <th>Title</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {cartItems.map((item) => (
+                    <tr key={item.id}>
+                      <td>
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          style={{
+                            width: "50px",
+                            height: "50px",
+                            objectFit: "cover",
+                          }}
+                        />
+                      </td>
+                      <td>{item.name}</td>
+                      <td>${item.price}</td>
+                      <td>{item.quantity}</td>
+                      <td>
+                        <Button
+                          variant="success"
+                          size="sm"
+                          onClick={() => addToCart(item)}
+                        >
+                          +
+                        </Button>{" "}
+                        <Button
+                          variant="danger"
+                          size="sm"
+                          onClick={() => removeFromCart(item)}
+                        >
+                          -
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+              <div className="text-center mt-3">
+                <h4>Total: ${getCartTotal().toFixed(2)}</h4>
+                <Button variant="warning" onClick={clearCart} className="mt-2">
+                  Clear Cart
+                </Button>
               </div>
-              <div className="flex gap-4">
-                <button
-                  className="px-4 py-2 bg-gray-800 text-white text-xs font-bold uppercase rounded hover:bg-gray-700 focus:outline-none focus:bg-gray-700"
-                  onClick={() => {
-                    addToCart(item)
-                  }}
-                >
-                  +
-                </button>
-                <p>{item.quantity}</p>
-                <button
-                  className="px-4 py-2 bg-gray-800 text-white text-xs font-bold uppercase rounded hover:bg-gray-700 focus:outline-none focus:bg-gray-700"
-                  onClick={() => {
-                    removeFromCart(item)
-                  }}
-                >
-                  -
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-        {
-          cartItems.length > 0 ? (
-            <div className="flex flex-col justify-between items-center">
-          <h1 className="text-lg font-bold">Total: ${getCartTotal()}</h1>
-          <button
-            className="px-4 py-2 bg-gray-800 text-white text-xs font-bold uppercase rounded hover:bg-gray-700 focus:outline-none focus:bg-gray-700"
-            onClick={() => {
-              clearCart()
-            }}
-          >
-            Clear cart
-          </button>
-        </div>
+            </>
           ) : (
-            <h1 className="text-lg font-bold">Your cart is empty</h1>
-          )
-        }
-      </div>
-    )
-  )
+            <div className="text-center">
+              <h4>Your cart is empty</h4>
+            </div>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={toggle}>
+            Close
+          </Button>
+          <Button
+            variant="success"
+            onClick={toggleCheckout}
+            disabled={cartItems.length === 0}
+          >
+            Checkout
+          </Button>
+          <CheckoutForm showModal={showCheckoutModal} toggle={toggleCheckout} />
+        </Modal.Footer>
+      </Modal>
+  );
 }
 
 Cart.propTypes = {
   showModal: PropTypes.bool,
-  toggle: PropTypes.func
-}
+  toggle: PropTypes.func,
+};
