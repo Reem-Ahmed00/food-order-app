@@ -1,57 +1,58 @@
-import { createContext, useReducer, useEffect } from "react";
+import React, { createContext, useReducer } from 'react';
 
-export const CartContext = createContext();
+const CartContext = createContext();
+
+const initialState = {
+  items: [],
+  totalAmount: 0,
+};
 
 const cartReducer = (state, action) => {
   switch (action.type) {
-    case "ADD_TO_CART":
-      const existingItem = state.find((item) => item.id === action.payload.id);
-      if (existingItem) {
-        return state.map((item) =>
-          item.id === action.payload.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        );
-      }
-      return [...state, { ...action.payload, quantity: 1 }];
-    case "REMOVE_FROM_CART":
-      return state
-        .map((item) =>
-          item.id === action.payload.id
-            ? { ...item, quantity: item.quantity - 1 }
-            : item
-        )
-        .filter((item) => item.quantity > 0);
-    case "CLEAR_CART":
-      return [];
+    case 'ADD_ITEM':
+      const updatedItems = [...state.items, action.item];
+      const updatedTotalAmount = state.totalAmount + action.item.price * action.item.quantity;
+      return {
+        items: updatedItems,
+        totalAmount: updatedTotalAmount,
+      };
+    case 'REMOVE_ITEM':
+      const filteredItems = state.items.filter(item => item.id !== action.id);
+      const totalAmountAfterRemoval = filteredItems.reduce((total, item) => total + item.price * item.quantity, 0);
+      return {
+        items: filteredItems,
+        totalAmount: totalAmountAfterRemoval,
+      };
     default:
       return state;
   }
 };
 
 export const CartProvider = ({ children }) => {
-  const [cartItems, dispatch] = useReducer(
-    cartReducer,
-    JSON.parse(localStorage.getItem("cartItems")) || []
-  );
+  const [cartState, dispatchCartAction] = useReducer(cartReducer, initialState);
 
-  const addToCart = (item) => dispatch({ type: "ADD_TO_CART", payload: item });
-  const removeFromCart = (item) =>
-    dispatch({ type: "REMOVE_FROM_CART", payload: item });
-  const clearCart = () => dispatch({ type: "CLEAR_CART" });
+  const addItemToCart = (item) => {
+    dispatchCartAction({ type: 'ADD_ITEM', item });
+  };
 
-  const getCartTotal = () =>
-    cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
-
-  useEffect(() => {
-    localStorage.setItem("cartItems", JSON.stringify(cartItems));
-  }, [cartItems]);
+  const removeItemFromCart = (id) => {
+    dispatchCartAction({ type: 'REMOVE_ITEM', id });
+  };
 
   return (
-    <CartContext.Provider
-      value={{ cartItems, addToCart, removeFromCart, clearCart, getCartTotal }}
-    >
+    <CartContext.Provider value={{
+      items: cartState.items,
+      totalAmount: cartState.totalAmount,
+      addItem: addItemToCart,
+      removeItem: removeItemFromCart,
+    }}>
       {children}
     </CartContext.Provider>
   );
 };
+
+export const useCart = () => {
+  return React.useContext(CartContext);
+};
+
+export default CartProvider;
