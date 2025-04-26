@@ -1,33 +1,21 @@
-import React, { useState } from 'react';
-import { CartProvider } from './context/CartContext';
-import MealsList from './components/Meals/MealsList';
-import CartModal from './components/Cart/CartModal';
-import './App.css';
+import React from "react";
+import MealsList from "./components/MealsList";
+import "bootstrap/dist/css/bootstrap.min.css";
+import Container from "react-bootstrap/Container";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
 
 function App() {
-  const [isCartOpen, setIsCartOpen] = useState(false);
-
-  const openCartHandler = () => {
-    setIsCartOpen(true);
-  };
-
-  const closeCartHandler = () => {
-    setIsCartOpen(false);
-  };
-
   return (
-    <CartProvider>
-      <header className="app-header">
-        <h1>Food Order App</h1>
-        <button className="cart-button" onClick={openCartHandler}>
-          Open Cart
-        </button>
-      </header>
-      <main>
-        <MealsList />
-        {isCartOpen && <CartModal onClose={closeCartHandler} />}
-      </main>
-    </CartProvider>
+    <>
+      <Container fluid>
+        <Row>
+          <Col>
+            <MealsList />
+          </Col>
+        </Row>
+      </Container>
+    </>
   );
 }
 
