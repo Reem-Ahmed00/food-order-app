@@ -6,6 +6,9 @@ import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import Nav from 'react-bootstrap/Nav';
+import Navbar from 'react-bootstrap/Navbar';
+import NavDropdown from 'react-bootstrap/NavDropdown';
 
 export default function MealsList() {
   const [meals, setMeals] = useState(null);
@@ -30,14 +33,15 @@ export default function MealsList() {
   }, []);
 
   return (
+    <>
     <Container className="mt-4">
       <Row className="justify-content-center">
+        <div className="d-flex justify-content-start mr-3 position-fixed">
+          <Button ref={cartRef} variant="primary" onClick={toggleCart}>
+            Cart ({cartItems.length})
+          </Button>
+        </div>
         <Col md={8}>
-          <div className="d-flex justify-content-between mb-3">
-            <Button ref={cartRef} variant="primary" onClick={toggleCart}>
-              Cart ({cartItems.length})
-            </Button>
-          </div>
           <Cart showModal={showCartModal} toggle={toggleCart} />
           <Row>
             {meals &&
@@ -50,5 +54,6 @@ export default function MealsList() {
         </Col>
       </Row>
     </Container>
+    </>
   );
 }

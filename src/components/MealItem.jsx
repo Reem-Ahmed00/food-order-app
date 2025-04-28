@@ -19,14 +19,14 @@ export default function MealItem({ meal }) {
   };
 
   return (
-    <div style={{ position: "relative" }}>
+    <>
       <Card
         style={{
           width: "100%",
           height: "100%",
-          display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
+          
         }}
       >
         <Card.Img
@@ -53,9 +53,9 @@ export default function MealItem({ meal }) {
             src={meal.image}
             alt={meal.name}
             initial={{
-              position: "absolute",
-              top: 0,
-              left: 0,
+              position: "fixed",
+              top: 10,
+              left: 10,
               width: "100px",
               height: "100px",
               opacity: 1,
@@ -70,13 +70,13 @@ export default function MealItem({ meal }) {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5 }}
             style={{
-              position: "absolute",
+              position: "fixed",
               zIndex: 1000,
               pointerEvents: "none",
             }}
           />
         )}
       </AnimatePresence>
-    </div>
+    </>
   );
 }
